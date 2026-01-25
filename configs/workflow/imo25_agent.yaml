@@ -1,0 +1,27 @@
+name: "imo_agent_workflow"
+max_runs: 10
+max_verification_turns: 30
+success_threshold: 3
+failure_threshold: 5
+
+binding:
+  workflow:
+    class: "easy_scaffold.workflows.agents.imo_agent.ImoAgentWorkflow"
+    payload_model: "easy_scaffold.workflows.workflow_models.ProblemPayload"
+  query:
+    collection: ${db.problems_collection}
+    template:
+      imo_agent_solution:
+        $exists: false
+  bindings:
+    inputs:
+      problem_id:
+        from: "_id"
+      statement:
+        from: "question"
+    outputs:
+      solution_text:
+        to: "imo_agent_solution"
+
+
+

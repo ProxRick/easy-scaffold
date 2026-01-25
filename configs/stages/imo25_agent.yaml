@@ -1,0 +1,71 @@
+# configs/stages/imo25_agent.yaml
+- name: InitialDraft
+  messages:
+    - role: "system"
+      template_path: "configs/prompts/imo25_agent/system_solver_prompt.md"
+    - role: "user"
+      template: "{problem_statement}"
+  input_mapping:
+    problem_statement: "statement"
+  output_key: "solution_text"
+
+- name: SelfImprovement
+  messages:
+    - role: "system"
+      template_path: "configs/prompts/imo25_agent/system_solver_prompt.md"
+    - role: "user"
+      template: "{problem_statement}"
+    - role: "assistant"
+      template: "{solution_text}"
+    - role: "user"
+      template_path: "configs/prompts/imo25_agent/self_improvement_prompt.md"
+  input_mapping:
+    problem_statement: "statement"
+    solution_text: "solution_text"
+  output_key: "solution_text"
+
+- name: CompletenessCheck
+  response_model: "easy_scaffold.configs.pydantic_models.VerificationOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/imo25_agent/completeness_check_prompt.md"
+  input_mapping:
+    solution_text: "solution_text"
+  output_mapping:
+    verdict: "completeness_verdict"
+
+- name: GenerateVerification
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/imo25_agent/generate_verification_prompt.md"
+  input_mapping:
+    problem_statement: "statement"
+    solution_text: "solution_text"
+  output_key: "verification_report"
+
+- name: InterpretVerification
+  response_model: "easy_scaffold.configs.pydantic_models.VerificationOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/imo25_agent/interpret_verification_prompt.md"
+  input_mapping:
+    verification_report: "verification_report"
+  output_mapping:
+    verdict: "verification_verdict"
+
+- name: Correction
+  messages:
+    - role: "system"
+      template_path: "configs/prompts/imo25_agent/system_solver_prompt.md"
+    - role: "user"
+      template: "{problem_statement}"
+    - role: "assistant"
+      template: "{solution_text}"
+    - role: "user"
+      template_path: "configs/prompts/imo25_agent/correction_prompt.md"
+  input_mapping:
+    problem_statement: "statement"
+    solution_text: "solution_text"
+    verification_report: "verification_report"
+  output_key: "solution_text"
+

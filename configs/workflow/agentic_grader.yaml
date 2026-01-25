@@ -1,0 +1,65 @@
+# configs/workflow/grader_agent.yaml
+# Workflow configuration for the grader agent
+
+name: "grader_agent_workflow"
+limit: null
+# Workflow configuration for variant and stage selection
+# Variant options: "1_stage", "3_stage", "5_stage"
+# Stage options:
+#   - solution_analysis: "SolutionAnalysisApproachabilityBased", "SolutionAnalysisPlain"
+#   - rubric_generation: "RubricGenerationApproachabilityBased", "RubricGenerationPlain", "RubricGenerationMilestoneBased"
+#   - grading: "GradingRelativeWithoutRubrics", "GradingAbsolute", "GradingGraderJudge", "GradingGraderJudgeNoReference"
+# grader_name: Unique identifier for this grader configuration (used to store results separately)
+#   Results will be stored under: annotated_solutions.{solution_id}.grading_results.{grader_name}
+variant: "5_stage"  # Default to 5-stage for backward compatibility
+grader_name: "gemini_3_pro_plain"  # Change this to a unique name for each grader configuration
+top_k_solutions: 15  # Number of top solutions to evaluate before clustering (None = use all)
+stages:
+  grading: "GradingGraderJudge"
+  solution_analysis: "SolutionAnalysisPlain"
+  rubric_generation: "RubricGenerationPlain"
+binding:
+  workflow:
+    class: "easy_scaffold.workflows.agents.grader_agent.GraderAgentWorkflow"
+    payload_model: "easy_scaffold.workflows.workflow_models.GraderPayload"
+  query:
+    collection: ${db.problems_collection}
+    template:
+      annotated_solutions:
+        $exists: true
+      "annotated_solutions.S1.grading_results.${workflow.grader_name}": 
+        $exists: false
+  bindings:
+    inputs:
+      problem_id:
+        from: "_id"
+      problem_statement:
+        from: "problem"
+      given_solutions:
+        from: "annotated_solutions"
+      forum_posts:
+        from: "posts"
+      cached_clustering:
+        from: "workflow_runs.grader_agent.clustering.gemini_3_pro_approachability_based"
+      cached_analysis:
+        from: "workflow_runs.grader_agent.analysis.${workflow.grader_name}"
+      cached_rubrics:
+        from: "workflow_runs.grader_agent.rubrics.${workflow.grader_name}"
+      cached_top_k_indices:
+        from: "workflow_runs.grader_agent.top_k_indices"
+    outputs:
+      status:
+        to: "workflow_runs.grader_agent.status"
+      clustering:
+        to: "workflow_runs.grader_agent.clustering.${workflow.grader_name}"
+      analysis:
+        to: "workflow_runs.grader_agent.analysis.${workflow.grader_name}"
+      rubrics:
+        to: "workflow_runs.grader_agent.rubrics.${workflow.grader_name}"
+      top_k_indices:
+        to: "workflow_runs.grader_agent.top_k_indices"
+      given_solutions:
+        to: "annotated_solutions"
+
+
+

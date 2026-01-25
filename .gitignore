@@ -1,0 +1,47 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE settings
+.idea/
+.vscode/
+.cursor/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+*.log.*
+
+# Hydra outputs
+outputs/
+multirun/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# mypy cache
+.mypy_cache/
+
+# Data files
+data/ 

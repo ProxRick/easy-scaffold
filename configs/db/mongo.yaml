@@ -1,0 +1,9 @@
+# /configs/db/mongo.yaml
+name: "mongo"
+connection_string: ${oc.env:MONGO_CONNECTION_STRING}
+problems_db_name: ${oc.env:DB_NAME, "AoPS"}
+logs_db_name: ${oc.env:DB_NAME, "AoPS"}
+problems_collection: ${oc.env:COLLECTION_NAME, "AoPS"}
+logs_collection: ${oc.env:LOG_COLLECTION_NAME, "solver_log"}
+
+

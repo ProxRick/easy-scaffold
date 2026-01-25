@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easy-scaffold"
+version = "0.1.0"
+description = "An agentic workflow system for solving Olympiad math problems"
+authors = [
+  { name = "Your Name", email = "your.email@example.com" },
+]
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "hydra-core",
+    "pydantic",
+    "motor",
+    "python-dotenv",
+    "tenacity",
+    "sympy",
+    "litellm",
+    "google-genai",
+    "jsonref",
+    "rich",
+    "hydra-colorlog",
+    "transformers",
+    "openai",
+    "modal",
+    "aiohttp",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "black",
+    "isort",
+    "flake8",
+]
+
+[project.scripts]
+easy-scaffold = "easy_scaffold.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+
+

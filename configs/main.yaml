@@ -1,0 +1,24 @@
+# configs/main.yaml
+defaults:
+  - db: mongo
+  - llm: default
+  - workflow: imo25_agent
+  - stages: imo25_agent
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog
+
+app:
+  max_concurrent_tasks: 20
+
+repository:
+  _target_: easy_scaffold.db.mongo_repository.MongoRepository
+  connection_string: ${db.connection_string}
+  default_database: ${db.problems_db_name}
+  tlsAllowInvalidCertificates: true  # Allow invalid SSL certificates (for servers without CA certs)
+  maxPoolSize: 200  # Increased for 64 concurrent tasks with large documents (default: 100)
+  minPoolSize: 10   # Maintain minimum connections for faster startup (default: 0)
+
+logging:
+  level: INFO
+
+

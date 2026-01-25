@@ -1,0 +1,239 @@
+# configs/stages/agentic_grader.yaml
+# Stage configurations for the grader agent workflow
+
+- name: SolutionClustering
+  response_model: "easy_scaffold.configs.pydantic_models.SolutionClusteringOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/similarity_assesment/solution_clustering.MD"
+  input_mapping:
+    problem_text: "problem_statement"
+    reference_solutions: "reference_solutions_text"
+  output_mapping:
+    clusters: "_clustering_dummy"
+
+- name: SimilarityAssessment
+  response_model: "easy_scaffold.configs.pydantic_models.SimilarityMatchOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/similarity_assesment/similarity_assesment.MD"
+  input_mapping:
+    problem_text: "problem_statement"
+    expert_representatives: "expert_clusters_json"
+    student_solution: "current_student_solution"
+  output_mapping:
+    closest_rep_id: "closest_rep_id"
+    justification: "similarity_justification"
+
+# Solution Analysis Variants
+- name: SolutionAnalysis
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/solution_analysis/approachability_based.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    correct_model_solution: "representative_solution"
+  output_key: "solution_analysis_text"
+
+- name: SolutionAnalysisApproachabilityBased
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/solution_analysis/approachability_based.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    correct_model_solution: "representative_solution"
+  output_key: "solution_analysis_text"
+
+- name: SolutionAnalysisPlain
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/solution_analysis/plain.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    correct_model_solution: "representative_solution"
+  output_key: "solution_analysis_text"
+
+# Rubric Generation Variants
+- name: RubricGeneration
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/rubrics_design/approachability_based.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    model_solution: "representative_solution"
+    strategic_insights_analysis: "solution_analysis_text"
+  output_key: "rubric_text"
+
+- name: RubricGenerationApproachabilityBased
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/rubrics_design/approachability_based.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    model_solution: "representative_solution"
+    strategic_insights_analysis: "solution_analysis_text"
+  output_key: "rubric_text"
+
+- name: RubricGenerationPlain
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/rubrics_design/plain.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    model_solution: "representative_solution"
+    strategic_insights_analysis: "solution_analysis_text"
+  output_key: "rubric_text"
+
+- name: RubricGenerationMilestoneBased
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/rubrics_design/milestone_based.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    model_solution: "representative_solution"
+    strategic_insights_analysis: "solution_analysis_text"
+  output_key: "rubric_text"
+
+- name: RubricGenerationHybridMilestoneApproachabilityBased
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/rubrics_design/milestone_approachability_hybrid.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    model_solution: "representative_solution"
+    strategic_insights_analysis: "solution_analysis_text"
+  output_key: "rubric_text"
+
+# Grading Variants
+- name: Grading
+  response_model: "easy_scaffold.configs.pydantic_models.GradingResultOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/graders/relative_grader_with_explicit_error_analysis.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    correct_model_solution: "representative_solution"
+    detailed_rubric: "rubric_text"
+    given_student_solution: "current_student_solution"
+  output_mapping:
+    overall_assessment: "grading_assessment"
+    solution_structure_analysis: "grading_structure_analysis"
+    substep_error_analysis: "grading_error_analysis"
+    cross_solution_consistency: "grading_consistency"
+    error_propagation_analysis: "grading_propagation"
+    rubric_milestone_assessment: "grading_rubric_assessment"
+    clarity_structure_notation: "grading_clarity"
+    constructive_feedback: "grading_feedback"
+
+- name: GradingRelativeWithoutRubrics
+  response_model: "easy_scaffold.configs.pydantic_models.GradingResultOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/graders/relative_grader_without_rubrics.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    correct_model_solution: "representative_solution"
+    given_student_solution: "current_student_solution"
+  output_mapping:
+    overall_assessment: "grading_assessment"
+    solution_structure_analysis: "grading_structure_analysis"
+    substep_error_analysis: "grading_error_analysis"
+    cross_solution_consistency: "grading_consistency"
+    error_propagation_analysis: "grading_propagation"
+    rubric_milestone_assessment: "grading_rubric_assessment"
+    clarity_structure_notation: "grading_clarity"
+    constructive_feedback: "grading_feedback"
+
+- name: GradingAbsolute
+  response_model: "easy_scaffold.configs.pydantic_models.GradingResultOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/graders/absolute_grader.MD"
+  input_mapping:
+    problem_statement: "problem_statement"
+    given_student_solution: "current_student_solution"
+  output_mapping:
+    overall_assessment: "grading_assessment"
+    solution_structure_analysis: "grading_structure_analysis"
+    substep_error_analysis: "grading_error_analysis"
+    cross_solution_consistency: "grading_consistency"
+    error_propagation_analysis: "grading_propagation"
+    rubric_milestone_assessment: "grading_rubric_assessment"
+    clarity_structure_notation: "grading_clarity"
+    constructive_feedback: "grading_feedback"
+
+- name: GradingGraderJudge
+  response_model: "easy_scaffold.configs.pydantic_models.GraderJudgeOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/graders/grader_judge_prompt.md"
+  input_mapping:
+    problem_statement: "problem_statement"
+    reference_solution: "representative_solution"
+    generator_solution: "current_student_solution"
+  output_mapping:
+    designed_marking_scheme: "grading_designed_marking_scheme"
+    overall_assessment: "grading_overall_assessment"
+    feedback: "grading_feedback_detail"
+
+- name: GradingGraderJudgeNoReference
+  response_model: "easy_scaffold.configs.pydantic_models.GraderJudgeOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/agentic_grader/graders/grader_judge_prompt_no_reference.md"
+  input_mapping:
+    problem_statement: "problem_statement"
+    generator_solution: "current_student_solution"
+  output_mapping:
+    designed_marking_scheme: "grading_designed_marking_scheme"
+    overall_assessment: "grading_overall_assessment"
+    feedback: "grading_feedback_detail"
+
+- name: SolutionCompletenessEvaluation
+  model_profile: "gemini_flash_lite"  # Use cheaper model for initial filtering
+  response_model: "easy_scaffold.configs.pydantic_models.SolutionCompletenessEvaluation"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/solution_selection/completeness_evaluation.md"
+  input_mapping:
+    problem_statement: "problem_statement"
+    solution_text: "solution_text"
+  output_mapping:
+    is_complete: "is_complete"
+    completeness_score: "completeness_score"
+    cleanliness_score: "cleanliness_score"
+    has_errors: "has_errors"
+    errors: "errors"
+    reasoning: "completeness_reasoning"
+
+- name: BestOfKSelection
+  response_model: "easy_scaffold.configs.pydantic_models.BestOfKSelectionOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/solution_selection/best_of_k_selection.md"
+  input_mapping:
+    problem_statement: "problem_statement"
+    solutions: "solutions"
+    completeness_scores: "completeness_scores"
+  output_mapping:
+    selected_index: "selected_index"
+    reasoning: "selection_reasoning"
+    comparison_notes: "comparison_notes"
+
+- name: SolutionFixer
+  model_profile: "gemini_pro"
+  response_model: "easy_scaffold.configs.pydantic_models.SolutionFixerOutput"
+  messages:
+    - role: "user"
+      template_path: "configs/prompts/solution_selection/solution_fixer.md"
+  input_mapping:
+    problem_statement: "problem_statement"
+    solution_text: "solution_text"
+    completeness_feedback: "completeness_feedback"
+  output_mapping:
+    fixed_solution: "fixed_solution"
+    changes_made: "changes_made"
+    reasoning: "fixer_reasoning"
+
+
+

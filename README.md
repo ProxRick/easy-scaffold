@@ -20,39 +20,6 @@ A minimal and hackable codebase for implementing agentic scaffolds with LLMs. Th
 - **Tutorials** - [Adding a New Stage](tutorials/add_new_stage_tutorial.md) | [Adding a New Workflow](tutorials/add_new_workflow_tutorial.md)
 - **Example Workflows** - [Agentic Grader](#example-implementations) | [IMO 2025 Agent](#example-implementations)
 
-## Installation
-
-Easy Scaffold requires Python 3.12 or later.
-
-```bash
-# Clone the repository
-git clone https://github.com/hamedmahdavi72/easy-scaffold.git
-cd easy-scaffold
-
-# Install uv if you haven't already
-# On macOS/Linux:
-curl -LsSf https://astral.sh/uv/install.sh | sh
-# On Windows (PowerShell):
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# Create virtual environment and install dependencies
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-uv pip install -e .
-
-# Or install with dev dependencies
-uv pip install -e ".[dev]"
-```
-
-Set up your environment variables in a `.env` file:
-
-```bash
-GEMINI_API_KEY=your_key_here
-OPENAI_API_KEY=your_key_here
-MONGO_CONNECTION_STRING=your_connection_string
-DB_NAME=AoPS
-```
-
 ## What This Is
 
 Easy Scaffold is a hackable foundation for building agentic systems. The codebase is intentionally small and straightforward. You can read through the core components in an afternoon and understand how everything fits together. This makes it easy to adapt for evaluation pipelines, data generation workflows, or RL training loops.
@@ -150,6 +117,39 @@ Every workflow run and stage execution is logged to MongoDB. You get stage input
   "model": "gpt-5.2",
   "timestamp": "2025-01-24T10:30:00Z"
 }
+```
+
+## Installation
+
+Easy Scaffold requires Python 3.12 or later.
+
+```bash
+# Clone the repository
+git clone https://github.com/hamedmahdavi72/easy-scaffold.git
+cd easy-scaffold
+
+# Install uv if you haven't already
+# On macOS/Linux:
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# On Windows (PowerShell):
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e .
+
+# Or install with dev dependencies
+uv pip install -e ".[dev]"
+```
+
+Set up your environment variables in a `.env` file:
+
+```bash
+GEMINI_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here
+MONGO_CONNECTION_STRING=your_connection_string
+DB_NAME=AoPS
 ```
 
 ## Architecture Overview

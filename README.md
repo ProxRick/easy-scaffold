@@ -156,6 +156,39 @@ DB_NAME=AoPS
 
 ## Architecture Overview
 
+```mermaid
+graph TD
+    subgraph Data_Layer [Data Layer]
+        DB[(MongoDB)]
+        Binding[Binding Resolver]
+    end
+
+    subgraph Orchestration_Layer [Orchestration Layer]
+        Workflow[Workflow Class]
+    end
+
+    subgraph Execution_Layer [Execution Layer]
+        Stage[ConfigurableStage]
+        Client[LLM Client]
+        Providers[[LLM Providers]]
+    end
+
+    %% Data Flow
+    DB <-->|Read/Write| Binding
+    Binding <-->|Init/Save| Workflow
+
+    %% Execution Flow
+    Workflow -->|Call| Stage
+    Stage -->|Use| Client
+    Client -->|API Call| Providers
+
+    %% Styling
+    style Data_Layer fill:#e1f5fe,stroke:#01579b
+    style Orchestration_Layer fill:#f3e5f5,stroke:#4a148c
+    style Execution_Layer fill:#e8f5e9,stroke:#1b5e20
+    style Providers fill:#fff3e0,stroke:#e65100
+```
+
 ```
 easy-scaffold/
 ├── configs/

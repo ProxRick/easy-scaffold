@@ -188,7 +188,9 @@ The core components are:
 
 ## How It Works
 
-You define a workflow class that implements your agent's strategy. The workflow receives canonical data models as input and can call stages by name. Stages are executed through the `ConfigurableStage` system, which handles prompt loading, LLM calls, response parsing, and output mapping.
+The framework orchestrates multi-step LLM workflows. You write Python code that defines your agent's decision-making logic, and configure LLM calls as stages in YAML. When you run a workflow, it processes documents from your database, calls LLMs through stages, and writes results back.
+
+Here's the flow: Your workflow class receives a `WorkItem` (a problem, solution, or whatever data you're processing). You call stages by name, passing context data. Each stage loads its prompt template, fills in variables from your context, calls an LLM, parses the response, and updates the context. Your workflow code decides what to do next based on the results—maybe call another stage, loop, or finish.
 
 Here's a simplified example workflow:
 

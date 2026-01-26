@@ -1,9 +1,18 @@
 from typing import Any, Dict
 
+from pydantic import BaseModel
+
 from easy_scaffold.workflows.workflow_models import ProblemPayload, WorkItem
 from easy_scaffold.db.pydantic_models import RunLog
 from easy_scaffold.workflows.base import AbstractWorkflow
-from easy_scaffold.workflows.processors import process_verification_result
+
+
+def process_verification_result(result: BaseModel) -> Dict[str, Any]:
+    """Checks for a 'yes' in the 'verdict' field of a Pydantic model."""
+    is_correct = False
+    if hasattr(result, "verdict"):
+        is_correct = "yes" in str(getattr(result, "verdict", "")).lower()
+    return {"is_correct": is_correct}
 
 
 class ImoAgentWorkflow(AbstractWorkflow[ProblemPayload]):

@@ -1,7 +1,6 @@
 # src/easy_scaffold/configs/pydantic_models.py
 from __future__ import annotations
 
-from enum import Enum
 from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -24,167 +23,9 @@ class MessageTemplate(BaseModel):
     template: Optional[str] = None
 
 
-class InitialDraftOutput(BaseModel):
-    solution_text: str = Field(description="The full text of the generated solution.")
-
-
 class VerificationOutput(BaseModel):
     verdict: str = Field(
         description="The verdict, typically 'yes' or 'no', indicating if the condition was met."
-    )
-
-
-# New rich verification schemas
-class IssueCategory(str, Enum):
-    CRITICAL_ERROR = "critical_error"
-    JUSTIFICATION_GAP = "justification_gap"
-    UNSUPPORTED_CLAIM = "unsupported_claim"
-    MISSING_CASE = "missing_case"
-    COMPUTATIONAL_ERROR = "computational_error"
-    LOGICAL_FALLACY = "logical_fallacy"
-
-
-class VerificationIssue(BaseModel):
-    span_id: str = Field(
-        description="Unique identifier for the span/location in the solution (e.g., 'claim_3', 'step_7')"
-    )
-    category: Literal[
-        "critical_error",
-        "justification_gap",
-        "unsupported_claim",
-        "missing_case",
-        "computational_error",
-        "logical_fallacy",
-    ] = Field(
-        description="Category of the issue found"
-    )
-    severity: int = Field(
-        ge=1, le=5,
-        description="Severity level: 1=minor, 5=critical blocking issue"
-    )
-    description: str = Field(
-        description="Detailed description of the issue"
-    )
-    quoted_text: str = Field(
-        description="The exact text from the solution that contains the issue"
-    )
-    suggestion: Optional[str] = Field(
-        None,
-        description="Suggested fix or approach to resolve the issue"
-    )
-    blocking: bool = Field(
-        description="Whether this issue blocks the proof from being valid"
-    )
-
-
-class ProofSubgoal(BaseModel):
-    id: str = Field(description="Unique identifier for the subgoal")
-    description: str = Field(description="What needs to be proven")
-    status: Literal["open", "in_progress", "resolved", "blocked"] = Field(
-        description="Current status of the subgoal"
-    )
-    dependencies: List[str] = Field(
-        default_factory=list,
-        description="IDs of other subgoals or claims this depends on"
-    )
-
-
-class RichVerificationOutput(BaseModel):
-    verdict: Literal["correct", "incorrect", "incomplete"] = Field(
-        description="Overall verdict on the solution"
-    )
-    is_complete: bool = Field(
-        description="Whether the solution addresses all aspects of the problem"
-    )
-    issues: List[VerificationIssue] = Field(
-        default_factory=list,
-        description="List of all issues found in the solution"
-    )
-    missing_lemmas: List[str] = Field(
-        default_factory=list,
-        description="Key lemmas or results that are used but not proven"
-    )
-    next_subgoals: List[ProofSubgoal] = Field(
-        default_factory=list,
-        description="Subgoals that need to be addressed for completion"
-    )
-    verified_claims: List[str] = Field(
-        default_factory=list,
-        description="List of claim IDs that have been successfully verified"
-    )
-    overall_confidence: float = Field(
-        ge=0.0, le=1.0,
-        description="Confidence in the overall assessment (0=very uncertain, 1=very confident)"
-    )
-    reasoning: str = Field(
-        description="Brief explanation of the verification reasoning"
-    )
-
-
-# Proof state tracking models
-class ProofClaim(BaseModel):
-    id: str = Field(description="Unique identifier for the claim")
-    content: str = Field(description="The mathematical claim or statement")
-    justification: Optional[str] = Field(None, description="How this claim is justified")
-    status: Literal["unverified", "verified", "disputed", "abandoned"] = Field(
-        default="unverified",
-        description="Verification status of the claim"
-    )
-    dependencies: List[str] = Field(
-        default_factory=list,
-        description="IDs of other claims this depends on"
-    )
-    span_location: Optional[str] = Field(
-        None,
-        description="Location in the solution text where this appears"
-    )
-
-
-class ProofState(BaseModel):
-    claims: List[ProofClaim] = Field(
-        default_factory=list,
-        description="All claims made in the proof"
-    )
-    subgoals: List[ProofSubgoal] = Field(
-        default_factory=list,
-        description="Current subgoals to be addressed"
-    )
-    issues: List[VerificationIssue] = Field(
-        default_factory=list,
-        description="Current unresolved issues"
-    )
-    lemmas_used: List[str] = Field(
-        default_factory=list,
-        description="External lemmas or theorems referenced"
-    )
-    proof_structure: Optional[str] = Field(
-        None,
-        description="High-level structure of the proof (e.g., 'induction', 'contradiction', 'construction')"
-    )
-    progress_score: float = Field(
-        default=0.0,
-        description="Monotonic progress score (0=no progress, 1=complete proof)"
-    )
-    
-    def compute_progress(self) -> float:
-        """Compute progress based on resolved subgoals and verified claims"""
-        if not self.subgoals and not self.claims:
-            return 0.0
-        
-        resolved_subgoals = sum(1 for s in self.subgoals if s.status == "resolved")
-        verified_claims = sum(1 for c in self.claims if c.status == "verified")
-        blocking_issues = sum(1 for i in self.issues if i.blocking)
-        
-        subgoal_progress = resolved_subgoals / len(self.subgoals) if self.subgoals else 1.0
-        claim_progress = verified_claims / len(self.claims) if self.claims else 1.0
-        issue_penalty = min(0.5, blocking_issues * 0.1)
-        
-        return max(0.0, min(1.0, 0.5 * subgoal_progress + 0.5 * claim_progress - issue_penalty))
-
-
-class GenerateVerificationOutput(BaseModel):
-    verification_report: str = Field(
-        description="The detailed text of the verification report."
     )
 
 
@@ -228,22 +69,6 @@ class SolutionEleganceEvaluation(BaseModel):
     reasoning: str = Field(description="Explanation of the evaluation")
 
 
-class BatchEleganceResponse(BaseModel):
-    """Response from batch elegance evaluation stage."""
-    evaluations: List[SolutionEleganceEvaluation] = Field(
-        default_factory=list,
-        description="List of elegance evaluations, one for each solution in order"
-    )
-
-
-class BatchEleganceResponse(BaseModel):
-    """Response from batch elegance evaluation stage."""
-    evaluations: List[SolutionEleganceEvaluation] = Field(
-        default_factory=list,
-        description="List of elegance evaluations, one for each solution in order"
-    )
-
-
 class BestOfKSelectionOutput(BaseModel):
     """Output from best-of-k selection stage."""
     selected_index: int = Field(
@@ -264,22 +89,6 @@ class RelaxedCompletenessEvaluation(BaseModel):
     fixability_score: float = Field(description="Score 0-1 for fixability")
     issues: List[str] = Field(description="List of issues found that need fixing")
     reasoning: str = Field(description="Explanation of the evaluation")
-
-
-class BatchCompletenessResponse(BaseModel):
-    """Response from batch completeness evaluation stage."""
-    evaluations: List[RelaxedCompletenessEvaluation] = Field(
-        default_factory=list,
-        description="List of completeness evaluations, one for each solution in order"
-    )
-
-
-class ComprehensiveCompletenessCheck(BaseModel):
-    """Strict completeness check for final acceptance."""
-    is_complete: bool = Field(description="Whether solution is complete and rigorous")
-    completeness_score: float = Field(description="Score 0-1 for completeness")
-    issues: List[str] = Field(description="List of remaining issues")
-    feedback: str = Field(description="Detailed feedback for fixing")
 
 
 class SolutionFixerOutput(BaseModel):
@@ -351,40 +160,6 @@ class GraderJudgeOutput(BaseModel):
     designed_marking_scheme: DesignedMarkingScheme = Field(description="The rubric designed from the problem/reference solution")
     overall_assessment: GradeResult = Field(description="The final grade and classification")
     feedback: FeedbackDetail = Field(description="Detailed feedback on achieved/missed milestones and errors")
-
-
-class AttemptVerificationOutput(BaseModel):
-    """Output from attempt verification stage."""
-    is_valid: bool = Field(description="True if the solution attempt is entirely free of mathematical errors")
-    verification_report: str = Field(description="Brief report identifying errors if is_valid is false, empty string if valid")
-
-
-class CoTSolutionFixerOutput(BaseModel):
-    """Output from the CoT verification solution fixer stage."""
-    is_fixable: bool = Field(description="True if the solution attempt has a salvageable core idea")
-    corrected_solution: str = Field(description="The corrected solution if fixable, else empty string")
-    reasoning: str = Field(description="Explanation if not fixable, else empty string")
-
-
-class IdeaLabelerOutput(BaseModel):
-    """Structured output from idea labeler stage."""
-    main_idea: str = Field(description="One or two sentences capturing the core conceptual insight")
-    proof_sketch: str = Field(description="Single compact paragraph explaining the conceptual flow")
-    tags: List[str] = Field(description="Ranked array of 6-10 tags from most specific to most general")
-
-
-class IssueCatcherOutput(BaseModel):
-    """Output model for issue catcher stage - detects self-reported issues in solutions."""
-    admits_issue: bool = Field(
-        description="True if the solution admits uncertainty/problems; false otherwise"
-    )
-    reasoning: str = Field(
-        description="Short explanation of why this value was chosen, based only on the solution text"
-    )
-    evidence: List[str] = Field(
-        default_factory=list,
-        description="List of exact quotes from the solution that support the decision; empty list if none"
-    )
 
 
 class StageConfig(BaseModel):

@@ -5,13 +5,6 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 
-class Problem(BaseModel):
-    """Represents a problem document from the 'problems' collection."""
-    post_url: str = Field(..., description="The URL of the problem post.")
-    problem: str = Field(..., description="The text of the problem.")
-    is_duplicate: bool = Field(..., description="Flag to indicate if the problem is a duplicate.")
-
-
 class StageLog(BaseModel):
     """Log for a single stage within a workflow run."""
     stage_name: str = Field(..., description="The name of the stage.")

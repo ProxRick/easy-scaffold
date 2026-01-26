@@ -12,9 +12,9 @@ from easy_scaffold.workflows.workflow_models import WorkflowBindingConfig
 class DbConfig(BaseModel):
     name: str
     connection_string: str
-    problems_db_name: str
+    data_db_name: str
     logs_db_name: str
-    problems_collection: str
+    data_collection: str
     logs_collection: str
 
 

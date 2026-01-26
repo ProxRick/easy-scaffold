@@ -23,7 +23,7 @@ binding:
     class: "easy_scaffold.workflows.agents.grader_agent.GraderAgentWorkflow"
     payload_model: "easy_scaffold.workflows.workflow_models.GraderPayload"
   query:
-    collection: ${db.problems_collection}
+    collection: ${db.data_collection}
     template:
       annotated_solutions:
         $exists: true

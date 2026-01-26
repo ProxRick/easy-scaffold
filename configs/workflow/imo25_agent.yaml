@@ -9,7 +9,7 @@ binding:
     class: "easy_scaffold.workflows.agents.imo_agent.ImoAgentWorkflow"
     payload_model: "easy_scaffold.workflows.workflow_models.ProblemPayload"
   query:
-    collection: ${db.problems_collection}
+    collection: ${db.data_collection}
     template:
       imo_agent_solution:
         $exists: false

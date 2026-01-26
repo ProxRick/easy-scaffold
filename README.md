@@ -48,8 +48,6 @@ class MyWorkflow(BaseWorkflow):
 
 LLM calls are defined as stages in YAML files. Each stage specifies a prompt template, input mappings, output handling, and optionally which model to use. This means you can iterate on prompts without touching Python code. You can create variants of stages (different prompts, different models) just by adding new YAML entries. The system handles loading prompts, calling the LLM, parsing responses, and mapping outputs back to your workflow.
 
-Why YAML? Because prompts are data, not code. They change frequently during experimentation. Keeping them in YAML means version control diffs are readable, non-programmers can edit them, and you can generate or transform them programmatically if needed.
-
 ```yaml
 - name: AnalyzeSolution
   model_profile: "gpt5_2"  # Switch models easily

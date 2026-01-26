@@ -158,43 +158,65 @@ DB_NAME=AoPS
 
 ```mermaid
 graph LR
-    %% Styling for rounded boxes and fonts
-    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,rx:10,ry:10,font-family:Arial,font-size:14px;
-    classDef db fill:#e3f2fd,stroke:#0277bd,stroke-width:2px,rx:5,ry:5;
-    classDef provider fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,rx:5,ry:5;
-    classDef layer fill:#fff,stroke:#ddd,stroke-width:2px,stroke-dasharray: 5 5;
+    %% Global Graph Settings
+    %% Layout: Horizontal Layers, Vertical Stacks inside
 
-    subgraph Data_Layer [Data Layer]
+    %% ------------------------------
+    %% STYLING CLASSES
+    %% ------------------------------
+    classDef default fill:#fff,stroke:#333,stroke-width:1px,rx:8,ry:8,font-family:Arial;
+    
+    %% Layer Backgrounds (Title Boxes)
+    classDef dataLayer fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1;
+    classDef orchLayer fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20;
+    classDef execLayer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c;
+
+    %% Node Styles (Inner Boxes)
+    classDef dbNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000;
+    classDef orchNode fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000;
+    classDef execNode fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000;
+
+    %% ------------------------------
+    %% LAYERS
+    %% ------------------------------
+    
+    subgraph Data_Layer [DATA LAYER]
         direction TB
-        DB[(MongoDB)]:::db
-        Binding(Binding Resolver)
+        DB[("MongoDB")]:::dbNode
     end
 
-    subgraph Orchestration_Layer [Orchestration Layer]
+    subgraph Orchestration_Layer [ORCHESTRATION LAYER]
         direction TB
-        Workflow(Workflow Class)
+        Binding["Binding Resolver"]:::orchNode
+        Workflow["Workflow Class"]:::orchNode
+        
+        %% Internal Orchestration Flow
+        Binding <-->|Init/Save| Workflow
     end
 
-    subgraph Execution_Layer [Execution Layer]
+    subgraph Execution_Layer [EXECUTION LAYER]
         direction TB
-        Stage(ConfigurableStage)
-        Client(LLM Client)
-        Providers[[LLM Providers]]:::provider
+        Stage["ConfigurableStage"]:::execNode
+        Client["LLM Client"]:::execNode
+        Providers["LLM Providers"]:::execNode
+        
+        %% Internal Execution Flow
+        Stage --> Client
+        Client -->|API| Providers
     end
 
-    %% Data Flow
-    DB <-->|Read/Write| Binding
-    Binding <-->|Init/Save| Workflow
-
-    %% Execution Flow
+    %% ------------------------------
+    %% CROSS-LAYER CONNECTIONS
+    %% ------------------------------
+    DB <--> Binding
     Workflow -->|Call| Stage
-    Stage -->|Use| Client
-    Client -->|API Call| Providers
 
-    %% Apply Layer Styles
-    style Data_Layer fill:#f5f5f5,stroke:#bbb,stroke-width:2px
-    style Orchestration_Layer fill:#f5f5f5,stroke:#bbb,stroke-width:2px
-    style Execution_Layer fill:#f5f5f5,stroke:#bbb,stroke-width:2px
+    %% ------------------------------
+    %% APPLY LAYER STYLES
+    %% ------------------------------
+    class Data_Layer dataLayer
+    class Orchestration_Layer orchLayer
+    class Execution_Layer execLayer
 ```
 
 ```

@@ -67,17 +67,22 @@ Workflows operate on canonical data models like `WorkItem`. How you get data int
 
 ```yaml
 binding:
+  workflow:
+    class: "easy_scaffold.workflows.agents.my_workflow.MyWorkflow"
+    payload_model: "easy_scaffold.workflows.workflow_models.ProblemPayload"
   query:
     collection: "problems"
-    filter: {"difficulty": "hard"}
-  inputs:
-    problem:
-      from: "statement"
-      to: "problem.text"
-  outputs:
-    result:
-      from: "final_score"
-      to: "results.score"
+    template:
+      difficulty: "hard"
+  bindings:
+    inputs:
+      problem_id:
+        from: "_id"
+      problem_statement:
+        from: "statement"
+    outputs:
+      final_score:
+        to: "results.score"
 ```
 
 ### Multi Provider LLM Support

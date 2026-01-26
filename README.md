@@ -157,20 +157,29 @@ DB_NAME=AoPS
 ## Architecture Overview
 
 ```mermaid
-graph TD
+graph LR
+    %% Styling for rounded boxes and fonts
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,rx:10,ry:10,font-family:Arial,font-size:14px;
+    classDef db fill:#e3f2fd,stroke:#0277bd,stroke-width:2px,rx:5,ry:5;
+    classDef provider fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,rx:5,ry:5;
+    classDef layer fill:#fff,stroke:#ddd,stroke-width:2px,stroke-dasharray: 5 5;
+
     subgraph Data_Layer [Data Layer]
-        DB[(MongoDB)]
-        Binding[Binding Resolver]
+        direction TB
+        DB[(MongoDB)]:::db
+        Binding(Binding Resolver)
     end
 
     subgraph Orchestration_Layer [Orchestration Layer]
-        Workflow[Workflow Class]
+        direction TB
+        Workflow(Workflow Class)
     end
 
     subgraph Execution_Layer [Execution Layer]
-        Stage[ConfigurableStage]
-        Client[LLM Client]
-        Providers[[LLM Providers]]
+        direction TB
+        Stage(ConfigurableStage)
+        Client(LLM Client)
+        Providers[[LLM Providers]]:::provider
     end
 
     %% Data Flow
@@ -182,11 +191,10 @@ graph TD
     Stage -->|Use| Client
     Client -->|API Call| Providers
 
-    %% Styling
-    style Data_Layer fill:#e1f5fe,stroke:#01579b
-    style Orchestration_Layer fill:#f3e5f5,stroke:#4a148c
-    style Execution_Layer fill:#e8f5e9,stroke:#1b5e20
-    style Providers fill:#fff3e0,stroke:#e65100
+    %% Apply Layer Styles
+    style Data_Layer fill:#f5f5f5,stroke:#bbb,stroke-width:2px
+    style Orchestration_Layer fill:#f5f5f5,stroke:#bbb,stroke-width:2px
+    style Execution_Layer fill:#f5f5f5,stroke:#bbb,stroke-width:2px
 ```
 
 ```

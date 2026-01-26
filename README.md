@@ -41,7 +41,6 @@ class MyWorkflow(BaseWorkflow):
             result = await self.stage("GenerateSolution", {...})
             if result["is_valid"]:
                 return result
-            await asyncio.sleep(2 ** attempt)  # Exponential backoff
         raise Exception("Failed after retries")
 ```
 

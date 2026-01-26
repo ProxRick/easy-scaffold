@@ -188,43 +188,56 @@ The core components are:
 
 ## How It Works
 
-The framework orchestrates multi-step LLM workflows. You write Python code that defines your agent's decision-making logic, and configure LLM calls as stages in YAML. When you run a workflow, it processes documents from your database, calls LLMs through stages, and writes results back.
+A workflow is a Python class that processes data by calling LLMs and making decisions. Here's what happens: you get a document from your database (like a math problem), call LLM stages to analyze or generate content, check the results, and decide what to do next—maybe call another stage, retry, or finish.
 
-Here's the flow: Your workflow class receives a `WorkItem` (a problem, solution, or whatever data you're processing). You call stages by name, passing context data. Each stage loads its prompt template, fills in variables from your context, calls an LLM, parses the response, and updates the context. Your workflow code decides what to do next based on the results—maybe call another stage, loop, or finish.
-
-Here's a simplified example workflow:
+Let's say you want to build a workflow that analyzes a solution and either grades it (if complete) or improves it (if incomplete). Here's how you'd write that:
 
 ```python
-class MyAgentWorkflow(BaseWorkflow):
-    async def run(self, work_item: WorkItem) -> Dict[str, Any]:
-        # Call a stage defined in YAML
-        analysis = await self.stage("SolutionAnalysis", {
-            "problem_statement": work_item.problem.text,
-            "solution_text": work_item.solution.text
-        })
+class MyAgentWorkflow(AbstractWorkflow):
+    async def _run(self, work_item: WorkItem, run_log: RunLog, document_id: str, workflow_name: str) -> Dict[str, Any]:
+        # Start with the data from the document
+        context = work_item.payload.model_dump()
         
-        # Use the output in your logic
-        if analysis["is_complete"]:
-            return await self.stage("FinalGrading", {...})
+        # Call a stage to analyze the solution
+        await self._execute_stage("SolutionAnalysis", context, run_log, document_id, workflow_name)
+        
+        # Check the result and decide what to do
+        if context.get("is_complete"):
+            # Solution is complete, grade it
+            await self._execute_stage("FinalGrading", context, run_log, document_id, workflow_name)
         else:
-            return await self.stage("ImprovementStage", {...})
+            # Solution needs work, improve it
+            await self._execute_stage("ImprovementStage", context, run_log, document_id, workflow_name)
+        
+        context["status"] = "completed"
+        return context
 ```
 
-The corresponding stage definition in YAML:
+The `SolutionAnalysis` stage is defined in YAML. It tells the framework which prompt to use, which model to call, and how to map the results back into your context:
 
 ```yaml
 - name: SolutionAnalysis
-  response_model: "easy_scaffold.workflows.workflow_models.SolutionAnalysis"
+  response_model: "easy_scaffold.configs.pydantic_models.SolutionCompletenessEvaluation"
   messages:
     - role: "user"
       template_path: "configs/prompts/solution_analysis.md"
   input_mapping:
-    problem_statement: "problem_statement"
-    solution_text: "solution_text"
+    problem_statement: "problem_statement"  # Reads from context["problem_statement"]
+    solution_text: "solution_text"          # Reads from context["solution_text"]
   output_mapping:
-    is_complete: "is_complete"
-    score: "completeness_score"
+    is_complete: "is_complete"               # Writes to context["is_complete"]
+    completeness_score: "score"              # Writes to context["score"]
 ```
+
+When you call `_execute_stage("SolutionAnalysis", ...)`, the framework:
+1. Loads the prompt template from `configs/prompts/solution_analysis.md`
+2. Fills in `{problem_statement}` and `{solution_text}` from your context
+3. Calls the LLM with that prompt
+4. Parses the response into a Pydantic model
+5. Extracts `is_complete` and `completeness_score` and writes them to your context
+6. Returns the result (which includes token stats, raw output, etc.)
+
+Your workflow code then reads `context["is_complete"]` to decide whether to grade or improve the solution.
 
 ## Configuration
 

